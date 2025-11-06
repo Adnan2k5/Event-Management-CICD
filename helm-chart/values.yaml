@@ -1,0 +1,69 @@
+# MySQL Configuration
+mysql:
+  image: mysql:8.0
+  storage: 5Gi
+  storageClass: standard # Change based on your cluster (e.g., gp2 for AWS, standard for minikube)
+  rootPassword: root
+  database: event
+
+# Backend Configuration
+backend:
+  image: your-dockerhub-username/event-management-backend:v1
+  replicas: 2
+  port: 2025
+  nodePort: 30025 # NodePort for external access (30000-32767 range)
+
+# Frontend Configuration
+frontend:
+  image: your-dockerhub-username/event-management-frontend:v1
+  replicas: 2
+  port: 80
+  nodePort: 30080 # NodePort for external access
+
+# Ingress Configuration
+ingress:
+  enabled: false # Set to true if you want to use Ingress
+  host: event-management.local
+  className: nginx # Change based on your ingress controller
+
+# Horizontal Pod Autoscaler Configuration
+autoscaling:
+  backend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  frontend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Resource Limits and Requests
+resources:
+  backend:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+  frontend:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  mysql:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
